@@ -28,8 +28,4 @@ export async function PATCH(
     console.error('Error updating task:', error);
     return NextResponse.json({ error: 'Failed to update task' }, { status: 500 });
   }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 42bd5acb (made some changes)
