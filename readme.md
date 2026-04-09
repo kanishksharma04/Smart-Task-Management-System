@@ -17,7 +17,7 @@ A modern, efficient task management system built with Next.js, incorporating Obj
 - **Relationships**: A User can have multiple Projects, and a Project can have multiple Tasks.
 
 ### Design Pattern
-- **Singleton Pattern**: Used for the Database connection management to ensure only one instance is active throughout the application lifecycle. See [database.ts](file:///Users/deepanshu./Desktop/Smart-Task-Management-System/src/src/lib/db/database.ts).
+- **Singleton Pattern**: Used for the Database connection management to ensure only one instance is active throughout the application lifecycle. See `db/database.js`.
 
 ### ER Diagram
 A detailed ER diagram is available in [er_diagram.md](file:///Users/deepanshu./Desktop/Smart-Task-Management-System/diagrams/er_diagram.md).
@@ -27,6 +27,9 @@ We follow an **Agile SDLC** approach, allowing for iterative development and fre
 
 ## Getting Started
 
-1. Navigate to `src/`
-2. Run `npm install`
-3. Run `npm run dev`
+1. Copy `.env.example` to `.env.local`
+2. Add your `MONGODB_URI` connection string to `.env.local`
+3. Run `npm install`
+4. Run `npm run dev`
+
+> `.env.local` is already ignored by Git via `.gitignore`, so your credentials stay local.

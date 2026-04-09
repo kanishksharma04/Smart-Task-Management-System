@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 export class Database {
   private static instance: Database;
-  private isConnected: boolean = false;
+  private isConnected = false;
 
   private constructor() {}
 
@@ -23,7 +23,6 @@ export class Database {
       throw new Error('MONGODB_URI is not defined in environment variables');
     }
 
-    // Fix accidental duplication like MONGODB_URI=MONGODB_URI=...
     const uri = rawUri.startsWith('MONGODB_URI=') ? rawUri.replace('MONGODB_URI=', '') : rawUri;
 
     try {

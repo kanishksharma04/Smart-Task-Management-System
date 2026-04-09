@@ -1,13 +1,28 @@
 import { NextResponse } from 'next/server';
 import { Database } from '@db/database';
 import TaskModel from '@db/models/TaskSchema';
+import { createLocalTask, getLocalTasks } from '@db/localTaskStore';
+
+const useLocalStore = !process.env.MONGODB_URI && process.env.NODE_ENV !== 'production';
+
+type TaskPayload = {
+  title: string;
+  description: string;
+  priority?: 'low' | 'medium' | 'high';
+  deadline?: string;
+};
 
 export async function POST(request: Request) {
   try {
-    const { title, description, priority, deadline } = await request.json();
+    const { title, description, priority, deadline } = (await request.json()) as TaskPayload;
 
     if (!title || !description) {
       return NextResponse.json({ error: 'Title and description are required' }, { status: 400 });
+    }
+
+    if (useLocalStore) {
+      const newTask = createLocalTask({ title, description, priority, deadline });
+      return NextResponse.json(newTask, { status: 201 });
     }
 
     const db = Database.getInstance();
@@ -18,7 +33,7 @@ export async function POST(request: Request) {
       description,
       priority: priority || 'medium',
       deadline: deadline ? new Date(deadline) : undefined,
-      status: 'pending'
+      status: 'pending',
     });
 
     return NextResponse.json(newTask, { status: 201 });
@@ -30,6 +45,10 @@ export async function POST(request: Request) {
 
 export async function GET() {
   try {
+    if (useLocalStore) {
+      return NextResponse.json(getLocalTasks());
+    }
+
     const db = Database.getInstance();
     await db.connect();
 
