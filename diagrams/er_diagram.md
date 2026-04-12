@@ -2,13 +2,8 @@
 
 ```mermaid
 erDiagram
-    USER ||--o{ PROJECT : manages
     PROJECT ||--o{ TASK : contains
-    USER {
-        string id PK
-        string name
-        string email
-    }
+
     PROJECT {
         string id PK
         string name
@@ -16,11 +11,14 @@ erDiagram
         datetime createdAt
         datetime updatedAt
     }
+
     TASK {
         string id PK
         string title
         string description
         string status
+        string priority
+        datetime deadline
         datetime createdAt
         datetime updatedAt
     }
@@ -28,6 +26,7 @@ erDiagram
 
 ## Entities and Relationships
 
-- **USER**: Represents a system user. One user can manage multiple projects.
-- **PROJECT**: Represents a task project. One project contains multiple tasks.
-- **TASK**: Represents an individual task within a project.
+- **PROJECT**: Represents a task project with a list of tasks.
+- **TASK**: Represents an individual task belonging to a project.
+- **Relationship**: One `PROJECT` contains many `TASK` entities.
+- **Notes**: `TASK.deadline` is optional in the model; `priority` is one of `low`, `medium`, `high`.
