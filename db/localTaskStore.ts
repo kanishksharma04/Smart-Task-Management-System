@@ -11,6 +11,7 @@ export interface ILocalTask {
   status: Status;
   priority: Priority;
   deadline?: string;
+  projectId?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -44,11 +45,13 @@ const createTaskRecord = ({
   description,
   priority,
   deadline,
+  projectId,
 }: {
   title: string;
   description: string;
   priority?: Priority;
   deadline?: string;
+  projectId?: string;
 }): ILocalTask => ({
   _id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
   title,
@@ -56,6 +59,7 @@ const createTaskRecord = ({
   status: 'pending',
   priority: priority || 'medium',
   deadline: deadline ? new Date(deadline).toISOString() : undefined,
+  projectId,
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
 });
@@ -69,14 +73,16 @@ export const createLocalTask = ({
   description,
   priority,
   deadline,
+  projectId,
 }: {
   title: string;
   description: string;
   priority?: Priority;
   deadline?: string;
+  projectId?: string;
 }): ILocalTask => {
   const tasks = loadTasks();
-  const newTask = createTaskRecord({ title, description, priority, deadline });
+  const newTask = createTaskRecord({ title, description, priority, deadline, projectId });
   tasks.unshift(newTask);
   saveTasks(tasks);
   return newTask;

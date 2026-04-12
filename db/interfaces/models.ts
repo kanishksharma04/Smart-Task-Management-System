@@ -8,6 +8,7 @@ export interface ITask {
   status: Status;
   priority: Priority;
   deadline?: Date;
+  projectId?: string;
   createdAt: Date;
   updatedAt: Date;
 }

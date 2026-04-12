@@ -1,0 +1,16 @@
+[
+  {
+    "_id": "1776017744749-e1amix",
+    "name": "study",
+    "description": "academics",
+    "createdAt": "2026-04-12T18:15:44.749Z",
+    "updatedAt": "2026-04-12T18:15:44.749Z"
+  },
+  {
+    "_id": "1776017675416-fry997",
+    "name": "daily",
+    "description": "daily activities",
+    "createdAt": "2026-04-12T18:14:35.416Z",
+    "updatedAt": "2026-04-12T18:14:35.416Z"
+  }
+]

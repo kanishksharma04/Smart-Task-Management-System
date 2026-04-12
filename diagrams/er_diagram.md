@@ -18,6 +18,7 @@ erDiagram
         string description
         string status
         string priority
+        string projectId FK
         datetime deadline
         datetime createdAt
         datetime updatedAt
@@ -27,6 +28,9 @@ erDiagram
 ## Entities and Relationships
 
 - **PROJECT**: Represents a task project with a list of tasks.
-- **TASK**: Represents an individual task belonging to a project.
+- **TASK**: Represents an individual task that may belong to a project.
 - **Relationship**: One `PROJECT` contains many `TASK` entities.
-- **Notes**: `TASK.deadline` is optional in the model; `priority` is one of `low`, `medium`, `high`.
+- **Notes**:
+  - `TASK.projectId` is optional; tasks can be unassigned or linked to a project.
+  - `TASK.deadline` is optional in the model.
+  - `priority` is one of `low`, `medium`, `high`.

@@ -10,18 +10,19 @@ type TaskPayload = {
   description: string;
   priority?: 'low' | 'medium' | 'high';
   deadline?: string;
+  projectId?: string;
 };
 
 export async function POST(request: Request) {
   try {
-    const { title, description, priority, deadline } = (await request.json()) as TaskPayload;
+    const { title, description, priority, deadline, projectId } = (await request.json()) as TaskPayload;
 
     if (!title || !description) {
       return NextResponse.json({ error: 'Title and description are required' }, { status: 400 });
     }
 
     if (useLocalStore) {
-      const newTask = createLocalTask({ title, description, priority, deadline });
+      const newTask = createLocalTask({ title, description, priority, deadline, projectId });
       return NextResponse.json(newTask, { status: 201 });
     }
 
@@ -34,6 +35,7 @@ export async function POST(request: Request) {
       priority: priority || 'medium',
       deadline: deadline ? new Date(deadline) : undefined,
       status: 'pending',
+      projectId: projectId || undefined,
     });
 
     return NextResponse.json(newTask, { status: 201 });
@@ -43,16 +45,23 @@ export async function POST(request: Request) {
   }
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const url = new URL(request.url);
+    const projectId = url.searchParams.get('projectId') || undefined;
+
     if (useLocalStore) {
-      return NextResponse.json(getLocalTasks());
+      const tasks = getLocalTasks();
+      return NextResponse.json(
+        projectId ? tasks.filter((task) => task.projectId === projectId) : tasks
+      );
     }
 
     const db = Database.getInstance();
     await db.connect();
 
-    const tasks = await TaskModel.find({}).sort({ createdAt: -1 });
+    const query = projectId ? { projectId } : {};
+    const tasks = await TaskModel.find(query).sort({ createdAt: -1 });
     return NextResponse.json(tasks);
   } catch (error) {
     console.error('Error fetching tasks:', error);

@@ -9,6 +9,7 @@ export interface ITaskDocument extends Document {
   status: TaskStatus;
   priority: TaskPriority;
   deadline?: Date;
+  projectId?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -28,6 +29,7 @@ const TaskSchema: Schema = new Schema(
       default: 'medium',
     },
     deadline: { type: Date },
+    projectId: { type: Schema.Types.ObjectId, ref: 'Project' },
   },
   { timestamps: true }
 );

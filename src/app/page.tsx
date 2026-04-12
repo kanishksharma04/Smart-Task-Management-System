@@ -23,21 +23,49 @@ interface ITask {
   status: 'pending' | 'in_progress' | 'completed';
   priority: 'low' | 'medium' | 'high';
   deadline?: string;
+  projectId?: string;
   createdAt: string;
+}
+
+interface IProject {
+  _id: string;
+  name: string;
+  description: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export default function Home() {
   const [tasks, setTasks] = useState<ITask[]>([]);
+  const [projects, setProjects] = useState<IProject[]>([]);
+  const [selectedProjectId, setSelectedProjectId] = useState('all');
+  const [projectName, setProjectName] = useState('');
+  const [projectDescription, setProjectDescription] = useState('');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState<'low' | 'medium' | 'high'>('medium');
   const [deadline, setDeadline] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isProjectLoading, setIsProjectLoading] = useState(false);
   const [error, setError] = useState('');
+  const [projectError, setProjectError] = useState('');
+
+  const fetchProjects = async () => {
+    try {
+      const res = await fetch('/api/projects');
+      if (res.ok) {
+        const data = (await res.json()) as IProject[];
+        setProjects(data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch projects', err);
+    }
+  };
 
   const fetchTasks = async () => {
     try {
-      const res = await fetch('/api/tasks');
+      const url = selectedProjectId === 'all' ? '/api/tasks' : `/api/tasks?projectId=${selectedProjectId}`;
+      const res = await fetch(url);
       if (res.ok) {
         const data = (await res.json()) as ITask[];
         setTasks(data);
@@ -48,8 +76,47 @@ export default function Home() {
   };
 
   useEffect(() => {
-    fetchTasks();
+    fetchProjects();
   }, []);
+
+  useEffect(() => {
+    fetchTasks();
+  }, [selectedProjectId]);
+
+  const handleCreateProject = async () => {
+    if (!projectName || !projectDescription) {
+      setProjectError('Project name and description are required.');
+      return;
+    }
+
+    setIsProjectLoading(true);
+    setProjectError('');
+
+    try {
+      const res = await fetch('/api/projects', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: projectName, description: projectDescription }),
+      });
+
+      if (res.ok) {
+        const project = (await res.json()) as IProject;
+        setProjectName('');
+        setProjectDescription('');
+        setSelectedProjectId(project._id);
+        await fetchProjects();
+        await fetchTasks();
+      } else {
+        const data = await res.json();
+        setProjectError(data.error || 'Failed to create project');
+      }
+    } catch (err) {
+      console.error('Failed to create project', err);
+      setProjectError('An error occurred. Please try again.');
+    } finally {
+      setIsProjectLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -60,7 +127,13 @@ export default function Home() {
       const res = await fetch('/api/tasks', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, description, priority, deadline }),
+        body: JSON.stringify({
+          title,
+          description,
+          priority,
+          deadline,
+          projectId: selectedProjectId === 'all' ? undefined : selectedProjectId,
+        }),
       });
 
       if (res.ok) {
@@ -270,78 +343,155 @@ export default function Home() {
             animate={{ opacity: 1, scale: 1 }}
             className="bg-white dark:bg-slate-900 p-8 rounded-[2rem] shadow-2xl border border-slate-200 dark:border-slate-800 sticky top-8"
           >
-            <h2 className="text-2xl font-black mb-8 text-slate-800 dark:text-white flex items-center gap-3 italic uppercase">
-              <Plus className="w-6 h-6 text-blue-600" />
-              Initialize
-            </h2>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="group">
-                <label className="block text-xs font-black text-slate-400 dark:text-slate-500 mb-2 uppercase tracking-widest pl-1">Target Title</label>
-                <input
-                  type="text"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  required
-                  className="w-full px-5 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-0 outline-none transition-all dark:text-white font-bold placeholder:font-normal placeholder:text-slate-400"
-                  placeholder="Deployment Alpha..."
-                />
-              </div>
+            <div className="space-y-8">
               <div>
-                <label className="block text-xs font-black text-slate-400 dark:text-slate-500 mb-2 uppercase tracking-widest pl-1">Description</label>
-                <textarea
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  required
-                  rows={4}
-                  className="w-full px-5 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-0 outline-none transition-all dark:text-white font-medium resize-none placeholder:font-normal placeholder:text-slate-400"
-                  placeholder="System requirements and mission parameters..."
-                />
+                <h2 className="text-2xl font-black mb-6 text-slate-800 dark:text-white flex items-center gap-3 italic uppercase">
+                  <Layout className="w-6 h-6 text-blue-600" />
+                  Project Hub
+                </h2>
+                <label className="block text-xs font-black text-slate-400 dark:text-slate-500 mb-2 uppercase tracking-widest pl-1">Project Scope</label>
+                <select
+                  value={selectedProjectId}
+                  onChange={(e) => setSelectedProjectId(e.target.value)}
+                  className="w-full px-4 py-3.5 rounded-2xl border-2 border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-0 outline-none dark:text-white font-bold"
+                >
+                  <option value="all">All Projects</option>
+                  {projects.map((project) => (
+                    <option key={project._id} value={project._id}>
+                      {project.name}
+                    </option>
+                  ))}
+                </select>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-black text-slate-400 dark:text-slate-500 mb-2 uppercase tracking-widest pl-1">Priority</label>
-                  <select
-                    value={priority}
-                    onChange={(e) => setPriority(e.target.value as ITask['priority'])}
-                    className="w-full px-4 py-3.5 rounded-2xl border-2 border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-0 outline-none dark:text-white font-bold"
-                  >
-                    <option value="low">Low</option>
-                    <option value="medium">Medium</option>
-                    <option value="high">High</option>
-                  </select>
+
+              <div className="bg-slate-50 dark:bg-slate-950/50 rounded-3xl p-6 border border-slate-200 dark:border-slate-800">
+                <div className="flex items-center gap-3 mb-4">
+                  <Plus className="w-5 h-5 text-blue-600" />
+                  <h3 className="text-xl font-black uppercase tracking-tight">New Project</h3>
                 </div>
-                <div>
-                  <label className="block text-xs font-black text-slate-400 dark:text-slate-500 mb-2 uppercase tracking-widest pl-1">Deadline</label>
+                <div className="space-y-4">
                   <input
-                    type="date"
-                    value={deadline}
-                    onChange={(e) => setDeadline(e.target.value)}
-                    className="w-full px-4 py-3.5 rounded-2xl border-2 border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-0 outline-none dark:text-white font-bold"
+                    value={projectName}
+                    onChange={(e) => setProjectName(e.target.value)}
+                    placeholder="Project name"
+                    className="w-full px-4 py-3.5 rounded-2xl border-2 border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 focus:border-blue-600 focus:ring-0 outline-none dark:text-white font-bold"
                   />
+                  <textarea
+                    value={projectDescription}
+                    onChange={(e) => setProjectDescription(e.target.value)}
+                    rows={3}
+                    placeholder="Project description"
+                    className="w-full px-4 py-3.5 rounded-2xl border-2 border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 focus:border-blue-600 focus:ring-0 outline-none dark:text-white font-medium resize-none"
+                  />
+                  {projectError && <p className="text-rose-500 text-sm font-bold">{projectError}</p>}
+                  <button
+                    type="button"
+                    onClick={handleCreateProject}
+                    disabled={isProjectLoading}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-3 rounded-2xl transition-all shadow-xl shadow-blue-500/30 disabled:opacity-50 uppercase tracking-widest"
+                  >
+                    {isProjectLoading ? 'Creating...' : 'Create Project'}
+                  </button>
                 </div>
               </div>
-              {error && <p className="text-rose-500 text-sm font-bold pl-1">{error}</p>}
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                type="submit"
-                disabled={isLoading}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-5 rounded-2xl transition-all shadow-xl shadow-blue-500/40 disabled:opacity-50 uppercase tracking-widest italic"
-              >
-                {isLoading ? 'Syncing...' : 'Deploy Protocol'}
-              </motion.button>
-            </form>
+
+              <div>
+                <h2 className="text-2xl font-black mb-8 text-slate-800 dark:text-white flex items-center gap-3 italic uppercase">
+                  <Plus className="w-6 h-6 text-blue-600" />
+                  Initialize
+                </h2>
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="group">
+                    <label className="block text-xs font-black text-slate-400 dark:text-slate-500 mb-2 uppercase tracking-widest pl-1">Target Title</label>
+                    <input
+                      type="text"
+                      value={title}
+                      onChange={(e) => setTitle(e.target.value)}
+                      required
+                      className="w-full px-5 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-0 outline-none transition-all dark:text-white font-bold placeholder:font-normal placeholder:text-slate-400"
+                      placeholder="Deployment Alpha..."
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-black text-slate-400 dark:text-slate-500 mb-2 uppercase tracking-widest pl-1">Description</label>
+                    <textarea
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      required
+                      rows={4}
+                      className="w-full px-5 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-0 outline-none transition-all dark:text-white font-medium resize-none placeholder:font-normal placeholder:text-slate-400"
+                      placeholder="System requirements and mission parameters..."
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 gap-4">
+                    <div>
+                      <label className="block text-xs font-black text-slate-400 dark:text-slate-500 mb-2 uppercase tracking-widest pl-1">Project</label>
+                      <select
+                        value={selectedProjectId}
+                        onChange={(e) => setSelectedProjectId(e.target.value)}
+                        className="w-full px-4 py-3.5 rounded-2xl border-2 border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-0 outline-none dark:text-white font-bold"
+                      >
+                        <option value="all">Unassigned / All Projects</option>
+                        {projects.map((project) => (
+                          <option key={project._id} value={project._id}>
+                            {project.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-black text-slate-400 dark:text-slate-500 mb-2 uppercase tracking-widest pl-1">Priority</label>
+                        <select
+                          value={priority}
+                          onChange={(e) => setPriority(e.target.value as ITask['priority'])}
+                          className="w-full px-4 py-3.5 rounded-2xl border-2 border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-0 outline-none dark:text-white font-bold"
+                        >
+                          <option value="low">Low</option>
+                          <option value="medium">Medium</option>
+                          <option value="high">High</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-black text-slate-400 dark:text-slate-500 mb-2 uppercase tracking-widest pl-1">Deadline</label>
+                        <input
+                          type="date"
+                          value={deadline}
+                          onChange={(e) => setDeadline(e.target.value)}
+                          className="w-full px-4 py-3.5 rounded-2xl border-2 border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:border-blue-600 focus:ring-0 outline-none dark:text-white font-bold"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  {error && <p className="text-rose-500 text-sm font-bold pl-1">{error}</p>}
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    type="submit"
+                    disabled={isLoading}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-5 rounded-2xl transition-all shadow-xl shadow-blue-500/40 disabled:opacity-50 uppercase tracking-widest italic"
+                  >
+                    {isLoading ? 'Syncing...' : 'Deploy Protocol'}
+                  </motion.button>
+                </form>
+              </div>
+            </div>
           </motion.section>
         </aside>
 
         <section className="lg:col-span-8 space-y-12">
           <div className="space-y-8">
-            <div className="flex items-center gap-4">
+            <div className="flex flex-wrap items-center gap-4">
               <h2 className="text-3xl font-black text-slate-900 dark:text-white uppercase italic tracking-tighter flex items-center gap-3">
                 <Zap className="w-8 h-8 text-blue-600" />
                 Active <span className="text-blue-600">Feed</span>
               </h2>
               <div className="h-px flex-grow bg-slate-200 dark:bg-slate-800"></div>
+              <span className="rounded-full border border-slate-200 dark:border-slate-800 px-4 py-2 text-xs font-bold uppercase tracking-widest text-slate-600 dark:text-slate-300">
+                {selectedProjectId === 'all'
+                  ? 'All Projects'
+                  : `${projects.find((project) => project._id === selectedProjectId)?.name || 'Selected Project'}`}
+              </span>
             </div>
 
             <motion.div layout className="grid gap-6">
