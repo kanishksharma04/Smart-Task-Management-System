@@ -14,7 +14,7 @@ We follow an **Agile** methodology for the Smart Task Management System.
 
 ## OOP Concepts Used
 
-- **Encapsulation**: Used in classes like `User`, `Project`, and `Task` to keep data and methods together.
+- **Encapsulation**: Used in classes like  `Project`, and `Task` to keep data and methods together.
 - **Inheritance/Interfaces**: Used `ITask` and `IProject` interfaces to define common structures.
 - **Polymorphism**: Potential for future use with different task types.
 - **Abstraction**: Using interfaces to hide implementation details.

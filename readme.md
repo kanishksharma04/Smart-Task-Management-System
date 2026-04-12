@@ -1,35 +1,73 @@
 # Smart Task Management System
 
-A modern, efficient task management system built with Next.js, incorporating Object-Oriented Programming (OOP) principles and design patterns.
+A modern task management system built using **Next.js, TypeScript, and MongoDB**, following **OOP principles** and **Agile SDLC**.
 
-## Project Structure
+---
 
-- `/src`: Next.js source code
-- `/docs`: Documentation and SDLC process
-- `/diagrams`: ER diagrams and class relationships
-- `/db`: Database connection and configuration scripts
+## 📁 Project Structure
 
-## Design Progress
+- `/src` - Application source code  
+- `/db` - Database connection and configuration  
+- `/diagrams` - ER diagrams  
+- `/docs` - SDLC documentation  
 
-### Object-Oriented Programming (OOP)
-- **Classes**: User, Task, Project, Category
-- **Interfaces**: ITaskAction, IProjectAction
-- **Relationships**: A User can have multiple Projects, and a Project can have multiple Tasks.
+---
 
-### Design Pattern
-- **Singleton Pattern**: Used for the Database connection management to ensure only one instance is active throughout the application lifecycle. See `db/database.js`.
+## 🧠 System Design
 
-### ER Diagram
-A detailed ER diagram is available in [er_diagram.md](file:///Users/deepanshu./Desktop/Smart-Task-Management-System/diagrams/er_diagram.md).
+### OOP Concepts
 
-### SDLC
-We follow an **Agile SDLC** approach, allowing for iterative development and frequent updates. See [sdlc.md](file:///Users/deepanshu./Desktop/Smart-Task-Management-System/docs/sdlc.md).
+- **Encapsulation** - Structured data using interfaces (`ITask`, `IProject`)  
+- **Abstraction** - Interfaces hide implementation details  
+- **Polymorphism** - Tasks handled differently based on status or priority  
+- **Inheritance** - Not implemented (can be extended in future)  
 
-## Getting Started
+---
 
-1. Copy `.env.example` to `.env.local`
-2. Add your `MONGODB_URI` connection string to `.env.local`
-3. Run `npm install`
-4. Run `npm run dev`
+### Relationships
 
-> `.env.local` is already ignored by Git via `.gitignore`, so your credentials stay local.
+- **Project → Tasks** (One-to-Many using `projectId`)  
+
+---
+
+## 🧩 Design Pattern
+
+- **Singleton Pattern** - Used for database connection to ensure a single instance throughout the application  
+
+---
+
+## 🗄️ Database
+
+- MongoDB with Mongoose  
+- Tasks reference Project using `projectId` (ObjectId)  
+- Supports optional relationship (tasks can exist independently)  
+
+---
+
+## 🔄 SDLC
+
+- Follows **Agile methodology**  
+- Iterative development with phases:
+  - Planning  
+  - Design  
+  - Implementation  
+  - Testing  
+  - Deployment  
+  - Maintenance  
+
+---
+
+## 🚀 Setup
+
+1. Create `.env.local` file  
+2. Add your MongoDB connection string:MONGODB_URI=your_connection_string
+3. Install dependencies:npm install
+4. Run the development server:npm run dev
+
+
+
+---
+
+## 📌 Summary
+
+> This system is built using Next.js with MongoDB, follows Agile SDLC, applies OOP principles, and implements a one-to-many relationship between projects and tasks using referencing.
