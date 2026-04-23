@@ -1,82 +1,103 @@
 # Smart Task Management System
 
-A modern task management system built using **Next.js, TypeScript, and MongoDB**, following **OOP principles** and **Agile SDLC**.
+A modern, robust, and scalable task management system built using **Next.js, TypeScript, and MongoDB**. This project strictly follows **SOLID principles**, implements the **Service-Repository Pattern**, and incorporates secure authentication practices.
+
+---
+
+## 🌟 Key Features
+
+- **MongoDB Backend**: Fully integrated MongoDB database utilizing Mongoose for object modeling.
+- **Secure Authentication**: JWT-based stateless authentication with `bcryptjs` for secure password hashing.
+- **SOLID Architecture**:
+  - **Single Responsibility Principle**: Separated routes, services, repositories, and models.
+  - **Open/Closed Principle**: Extended functionality via abstract classes like `BaseService` and `BaseRepository`.
+  - **Dependency Inversion**: High-level modules depend on abstractions (interfaces like `IRepository`, `ITaskService`) rather than concrete implementations.
+- **Robust Testing**: Configured with Jest and React Testing Library.
+- **Modern Next.js**: Built using the Next.js App Router for server-side rendering and API routes.
 
 ---
 
 ## 📁 Project Structure
 
-- `/src` - Application source code  
-- `/db` - Database connection and configuration  
-- `/diagrams` - ER, class, use case, and sequence diagrams  
-- `/docs` - SDLC documentation  
+```text
+/src
+ ├── /app          # Next.js App Router pages and API routes
+ └── middleware.ts # Edge middleware for JWT route protection
+
+/db
+ ├── /abstracts    # Abstract base classes (BaseService, BaseRepository)
+ ├── /interfaces   # TypeScript interfaces for models, services, repositories
+ ├── /models       # Mongoose schemas (TaskSchema, etc.)
+ ├── /repositories # Concrete repository implementations
+ └── /services     # Business logic layer
+
+/tests             # Jest test suites
+/diagrams          # ER, class, use case, and sequence diagrams
+/docs              # SDLC and project documentation
+```
 
 ---
 
-## 📊 Architecture Diagrams
+## 🧠 System Design & Patterns
 
-- [`diagrams/er_diagram.png`](./diagrams/er_diagram.png) - Entity Relationship Diagram
-- [`diagrams/class_diagram.md`](./diagrams/class_diagram.md) - Class Diagram
-- [`diagrams/use_case_diagram.md`](./diagrams/use_case_diagram.md) - Use Case Diagram
-- [`diagrams/sequence_diagram.md`](./diagrams/sequence_diagram.md) - Sequence Diagram
+### Design Patterns
+- **Repository Pattern**: Abstracts database operations away from business logic.
+- **Service Pattern**: Encapsulates business logic, making it reusable across API endpoints.
+- **Singleton Pattern**: Used for Service and Repository instances to manage resources efficiently and ensure a single database connection through `dbConnect()`.
 
----
-
-## 🧠 System Design
-
-### OOP Concepts
-
-- **Encapsulation** - Structured data using interfaces (`ITask`, `IProject`)  
-- **Abstraction** - Interfaces hide implementation details  
-- **Polymorphism** - Tasks handled differently based on status or priority  
-- **Inheritance** - Not implemented (can be extended in future)  
+### Object-Oriented Principles (OOP)
+- **Abstraction**: Base classes and interfaces hide database implementation details.
+- **Encapsulation**: Strict type checking via interfaces (`ITask`, `IProject`).
+- **Polymorphism**: Inherited services and repositories can override base methods as needed.
 
 ---
 
-### Relationships
+## 🗄️ Database Schema
 
-- **Project → Tasks** (One-to-Many using `projectId`)  
-
----
-
-## 🧩 Design Pattern
-
-- **Singleton Pattern** - Used for database connection to ensure a single instance throughout the application  
+- **MongoDB with Mongoose**
+- Tasks reference Projects using a one-to-many relationship (`projectId` as `ObjectId`).
+- Users and Tasks maintain a one-to-many relationship (`assignedTo`).
 
 ---
 
-## 🗄️ Database
+## 🚀 Setup & Installation
 
-- MongoDB with Mongoose  
-- Tasks reference Project using `projectId` (ObjectId)  
-- Supports optional relationship (tasks can exist independently)  
+### 1. Prerequisites
+- Node.js (v18+)
+- MongoDB connection URI
+
+### 2. Installation
+```bash
+# Clone the repository
+# Install dependencies
+npm install
+```
+
+### 3. Environment Variables
+Create a `.env.local` file in the root directory:
+```env
+MONGODB_URI=mongodb+srv://<username>:<password>@cluster.mongodb.net/task-system
+JWT_SECRET=your_super_secret_jwt_key
+```
+
+### 4. Running the App
+```bash
+# Start the development server
+npm run dev
+
+# Build for production
+npm run build
+npm start
+```
+
+### 5. Running Tests
+```bash
+# Run the Jest test suite
+npm run test
+```
 
 ---
 
-## 🔄 SDLC
+## 🔄 SDLC Methodology
 
-- Follows **Agile methodology**  
-- Iterative development with phases:
-  - Planning  
-  - Design  
-  - Implementation  
-  - Testing  
-  - Deployment  
-  - Maintenance  
-
----
-
-## 🚀 Setup
-
-1. Create `.env.local` file  
-2. Add your MongoDB connection string:MONGODB_URI=your_connection_string
-3. Install dependencies:npm install
-4. Run the development server:npm run dev
-
-
-
----
-
-## 📌 Summary
-
-> This system is built using Next.js with MongoDB, follows Agile SDLC, applies OOP principles, and implements a one-to-many relationship between projects and tasks using referencing.
+This project was developed following **Agile methodology**, with iterative phases of Planning, Design, Implementation, Testing, and Deployment, ensuring maintainability and scalability.
