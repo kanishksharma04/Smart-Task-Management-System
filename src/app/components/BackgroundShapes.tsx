@@ -15,18 +15,19 @@ interface Shape {
 }
 
 const COLORS = [
-  'bg-blue-500/8 dark:bg-blue-400/8',
-  'bg-violet-500/8 dark:bg-violet-400/8',
-  'bg-emerald-500/6 dark:bg-emerald-400/6',
-  'bg-amber-500/6 dark:bg-amber-400/6',
-  'bg-rose-500/5 dark:bg-rose-400/5',
-  'bg-cyan-500/6 dark:bg-cyan-400/6',
+  'bg-blue-600/6 dark:bg-blue-500/8',
+  'bg-violet-600/6 dark:bg-violet-500/8',
+  'bg-emerald-600/5 dark:bg-emerald-500/6',
+  'bg-amber-600/4 dark:bg-amber-500/6',
+  'bg-rose-600/4 dark:bg-rose-500/5',
+  'bg-cyan-600/5 dark:bg-cyan-500/6',
+  'bg-indigo-600/6 dark:bg-indigo-500/8',
 ];
 
 const BORDER_COLORS = [
-  'border-blue-500/15 dark:border-blue-400/15',
-  'border-violet-500/15 dark:border-violet-400/15',
-  'border-emerald-500/10 dark:border-emerald-400/10',
+  'border-blue-600/12 dark:border-blue-500/15',
+  'border-violet-600/12 dark:border-violet-500/15',
+  'border-emerald-600/10 dark:border-emerald-500/12',
 ];
 
 function generateShapes(count: number): Shape[] {
@@ -180,12 +181,42 @@ export default function BackgroundShapes({ count = 12, className = '' }: Backgro
 
   return (
     <div className={`fixed inset-0 overflow-hidden pointer-events-none z-0 ${className}`}>
+      {/* Animated gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 via-transparent to-purple-50/20 dark:from-blue-950/10 dark:via-transparent dark:to-purple-950/10" />
+      
       {/* Dot grid pattern */}
       <div
-        className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05]"
+        className="absolute inset-0 opacity-[0.025] dark:opacity-[0.08]"
         style={{
-          backgroundImage: 'radial-gradient(circle, currentColor 1px, transparent 1px)',
-          backgroundSize: '32px 32px',
+          backgroundImage: 'radial-gradient(circle, #3b82f6 0.5px, transparent 0.5px)',
+          backgroundSize: '40px 40px',
+        }}
+      />
+
+      {/* Radial gradient lights */}
+      <motion.div
+        className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-gradient-to-r from-blue-400/20 to-violet-400/10 dark:from-blue-500/10 dark:to-violet-500/5 blur-3xl"
+        animate={{
+          scale: [1, 1.2, 1],
+          opacity: [0.3, 0.5, 0.3],
+        }}
+        transition={{
+          duration: 8,
+          repeat: Infinity,
+          ease: 'easeInOut',
+        }}
+      />
+      <motion.div
+        className="absolute bottom-1/4 right-1/4 w-96 h-96 rounded-full bg-gradient-to-l from-emerald-400/20 to-cyan-400/10 dark:from-emerald-500/10 dark:to-cyan-500/5 blur-3xl"
+        animate={{
+          scale: [1.2, 1, 1.2],
+          opacity: [0.5, 0.3, 0.5],
+        }}
+        transition={{
+          duration: 10,
+          repeat: Infinity,
+          ease: 'easeInOut',
+          delay: 1,
         }}
       />
 
