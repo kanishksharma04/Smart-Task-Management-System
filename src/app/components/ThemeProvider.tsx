@@ -10,7 +10,7 @@ interface ThemeContextType {
 }
 
 const ThemeContext = createContext<ThemeContextType>({
-  theme: 'dark',
+  theme: 'light',
   toggleTheme: () => {},
 });
 
@@ -18,37 +18,31 @@ export function useTheme() {
   return useContext(ThemeContext);
 }
 
+function applyTheme(t: Theme) {
+  if (t === 'dark') {
+    document.documentElement.classList.add('dark');
+  } else {
+    document.documentElement.classList.remove('dark');
+  }
+}
+
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>('dark');
-  const [mounted, setMounted] = useState(false);
+  const [theme, setTheme] = useState<Theme>('light');
 
   useEffect(() => {
-    const saved = localStorage.getItem('taskforge-theme') as Theme | null;
-    if (saved) {
-      setTheme(saved);
-    }
-    setMounted(true);
+    // Read the class already set by the inline script in layout.tsx
+    const isDark = document.documentElement.classList.contains('dark');
+    setTheme(isDark ? 'dark' : 'light');
   }, []);
 
-  useEffect(() => {
-    if (!mounted) return;
-    const root = document.documentElement;
-    if (theme === 'dark') {
-      root.classList.add('dark');
-    } else {
-      root.classList.remove('dark');
-    }
-    localStorage.setItem('taskforge-theme', theme);
-  }, [theme, mounted]);
-
   const toggleTheme = () => {
-    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+    setTheme((prev) => {
+      const next: Theme = prev === 'dark' ? 'light' : 'dark';
+      applyTheme(next);
+      try { localStorage.setItem('taskforge-theme', next); } catch {}
+      return next;
+    });
   };
-
-  // Prevent flash of wrong theme
-  if (!mounted) {
-    return <div style={{ visibility: 'hidden' }}>{children}</div>;
-  }
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>

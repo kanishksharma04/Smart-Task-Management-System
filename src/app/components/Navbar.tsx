@@ -1,139 +1,237 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { Layout, Sun, Moon, LogOut, User, Menu, X } from 'lucide-react';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  Layout,
+  Sun,
+  Moon,
+  LogOut,
+  User,
+  Menu,
+  X,
+  LayoutDashboard,
+  ListTodo,
+  Users,
+  FolderOpen,
+  Home,
+  LogIn,
+  UserPlus,
+} from 'lucide-react';
 import { useTheme } from './ThemeProvider';
 import { useAuth } from './AuthProvider';
 import Link from 'next/link';
-import { useState } from 'react';
+import { usePathname } from 'next/navigation';
 
 export default function Navbar() {
   const { theme, toggleTheme } = useTheme();
   const { user, logout, isAdmin } = useAuth();
+  const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const adminLinks = [
+    { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { href: '/dashboard#tasks', label: 'Tasks', icon: ListTodo },
+    { href: '/dashboard#team', label: 'Team', icon: Users },
+    { href: '/dashboard#projects', label: 'Projects', icon: FolderOpen },
+  ];
+
+  const memberLinks = [
+    { href: '/member', label: 'My Tasks', icon: ListTodo },
+  ];
+
+  const guestLinks = [
+    { href: '/', label: 'Home', icon: Home },
+    { href: '/login', label: 'Sign In', icon: LogIn },
+    { href: '/signup', label: 'Sign Up', icon: UserPlus },
+  ];
+
+  const navLinks = user ? (isAdmin ? adminLinks : memberLinks) : guestLinks;
+
+  const isActive = (href: string) => pathname === href || pathname === href.split('#')[0];
 
   return (
     <>
-      <motion.nav
-        initial={{ y: -80, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.6, ease: "easeInOut" }}
-        className="sticky top-0 z-50 bg-white/70 dark:bg-slate-950/70 backdrop-blur-2xl border-b border-slate-200/50 dark:border-slate-700/50 shadow-sm dark:shadow-lg dark:shadow-blue-900/20"
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
-          {/* Logo */}
-          <Link href={user ? (isAdmin ? '/dashboard' : '/member') : '/'} className="flex items-center gap-2 sm:gap-3 group">
-            <div className="p-2 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl shadow-lg shadow-blue-600/30 group-hover:shadow-blue-600/50 transition-all duration-300 group-hover:scale-110">
-              <Layout className="w-5 h-5 text-white" />
-            </div>
-            <div className="hidden xs:block">
-              <h1 className="text-lg sm:text-xl font-black tracking-tight text-slate-900 dark:text-white uppercase leading-tight">
-                Task<span className="bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent">Forge</span>
-              </h1>
-            </div>
-          </Link>
-
-          {/* Desktop navigation */}
-          <div className="hidden sm:flex items-center gap-2 sm:gap-3">
-            {/* Theme toggle */}
-            <motion.button
-              whileHover={{ scale: 1.1, rotate: 15 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={toggleTheme}
-              className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-400 hover:bg-blue-100 dark:hover:bg-slate-700 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-200"
-              aria-label="Toggle theme"
+      <nav className="sticky top-0 z-50 w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="flex items-center h-16 gap-6">
+            {/* Logo */}
+            <Link
+              href={user ? (isAdmin ? '/dashboard' : '/member') : '/'}
+              className="flex items-center gap-2 shrink-0 group"
             >
-              {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-            </motion.button>
-
-            {/* User info + logout */}
-            {user && (
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2.5 px-3 sm:px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200/50 dark:border-slate-700/50 hover:border-blue-300 dark:hover:border-blue-500/50 transition-colors">
-                  <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center shadow-md">
-                    <User className="w-3.5 sm:w-4 h-3.5 sm:h-4 text-white" />
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white leading-tight truncate max-w-[100px] sm:max-w-none">
-                      {user.name}
-                    </span>
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400">
-                      {user.role}
-                    </span>
-                  </div>
-                </div>
-
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={logout}
-                  className="p-2.5 rounded-xl bg-red-50 dark:bg-red-950/30 text-red-500 hover:bg-red-100 dark:hover:bg-red-950/50 transition-all duration-200"
-                  aria-label="Logout"
-                >
-                  <LogOut className="w-5 h-5" />
-                </motion.button>
+              <div className="p-1.5 bg-blue-600 rounded-lg group-hover:bg-blue-700 transition-colors">
+                <Layout className="w-4 h-4 text-white" />
               </div>
-            )}
-          </div>
+              <span className="text-base font-black tracking-tight text-slate-900 dark:text-white">
+                Task<span className="text-blue-600">Forge</span>
+              </span>
+            </Link>
 
-          {/* Mobile menu button */}
-          <div className="flex sm:hidden items-center gap-2">
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={toggleTheme}
-              className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400"
-            >
-              {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={() => setMobileOpen(!mobileOpen)}
-              className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-400"
-            >
-              {mobileOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
-            </motion.button>
+            {/* Desktop nav links */}
+            <div className="hidden md:flex items-center gap-1 flex-1">
+              {navLinks.map(({ href, label, icon: Icon }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-150 ${
+                    isActive(href)
+                      ? 'bg-blue-600 text-white shadow-sm'
+                      : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                >
+                  <Icon className="w-3.5 h-3.5" />
+                  {label}
+                </Link>
+              ))}
+            </div>
+
+            {/* Right side */}
+            <div className="hidden md:flex items-center gap-2 ml-auto shrink-0">
+              {/* Theme toggle */}
+              <button
+                onClick={toggleTheme}
+                className="p-2 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-colors"
+                aria-label="Toggle theme"
+              >
+                {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              </button>
+
+              {user ? (
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                    <div className="w-6 h-6 rounded-md bg-blue-600 flex items-center justify-center shrink-0">
+                      <User className="w-3.5 h-3.5 text-white" />
+                    </div>
+                    <div className="flex flex-col leading-none">
+                      <span className="text-sm font-semibold text-slate-900 dark:text-white max-w-[100px] truncate">
+                        {user.name}
+                      </span>
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400">
+                        {user.role}
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    onClick={logout}
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+                    aria-label="Logout"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Logout
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <Link
+                    href="/login"
+                    className="px-4 py-2 rounded-lg text-sm font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                  >
+                    Sign In
+                  </Link>
+                  <Link
+                    href="/signup"
+                    className="px-4 py-2 rounded-lg text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+                  >
+                    Sign Up
+                  </Link>
+                </div>
+              )}
+            </div>
+
+            {/* Mobile controls */}
+            <div className="flex md:hidden items-center gap-1 ml-auto">
+              <button
+                onClick={toggleTheme}
+                className="p-2 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                aria-label="Toggle theme"
+              >
+                {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              </button>
+              <button
+                onClick={() => setMobileOpen(!mobileOpen)}
+                className="p-2 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                aria-label="Toggle menu"
+              >
+                {mobileOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+              </button>
+            </div>
           </div>
         </div>
 
         {/* Mobile menu */}
-        {mobileOpen && user && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="sm:hidden border-t border-slate-200/50 dark:border-slate-700/50 px-4 py-3 bg-gradient-to-b from-white/50 to-transparent dark:from-slate-950/50"
-          >
-            <div className="flex flex-col gap-3">
-              <div className="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800/80">
-                <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center">
-                  <User className="w-3.5 h-3.5 text-white" />
-                </div>
-                <div className="flex flex-col flex-1 min-w-0">
-                  <span className="text-xs font-bold text-slate-900 dark:text-white truncate">
-                    {user.name}
-                  </span>
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400">
-                    {user.role}
-                  </span>
-                </div>
+        <AnimatePresence>
+          {mobileOpen && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="md:hidden overflow-hidden border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900"
+            >
+              <div className="px-4 py-3 space-y-1">
+                {navLinks.map(({ href, label, icon: Icon }) => (
+                  <Link
+                    key={href}
+                    href={href}
+                    onClick={() => setMobileOpen(false)}
+                    className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-semibold transition-colors ${
+                      isActive(href)
+                        ? 'bg-blue-600 text-white'
+                        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
+                    }`}
+                  >
+                    <Icon className="w-4 h-4" />
+                    {label}
+                  </Link>
+                ))}
+
+                {user ? (
+                  <div className="pt-2 border-t border-slate-200 dark:border-slate-800 mt-2 space-y-1">
+                    <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800">
+                      <div className="w-6 h-6 rounded-md bg-blue-600 flex items-center justify-center">
+                        <User className="w-3.5 h-3.5 text-white" />
+                      </div>
+                      <span className="text-sm font-semibold text-slate-900 dark:text-white truncate flex-1">
+                        {user.name}
+                      </span>
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400">
+                        {user.role}
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => { logout(); setMobileOpen(false); }}
+                      className="w-full flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-semibold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Logout
+                    </button>
+                  </div>
+                ) : (
+                  <div className="pt-2 border-t border-slate-200 dark:border-slate-800 mt-2 grid grid-cols-2 gap-2">
+                    <Link
+                      href="/login"
+                      onClick={() => setMobileOpen(false)}
+                      className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg text-sm font-semibold border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                    >
+                      <LogIn className="w-4 h-4" />
+                      Sign In
+                    </Link>
+                    <Link
+                      href="/signup"
+                      onClick={() => setMobileOpen(false)}
+                      className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+                    >
+                      <UserPlus className="w-4 h-4" />
+                      Sign Up
+                    </Link>
+                  </div>
+                )}
               </div>
-              <motion.button
-                whileTap={{ scale: 0.95 }}
-                onClick={() => {
-                  logout();
-                  setMobileOpen(false);
-                }}
-                className="w-full py-2 px-3 rounded-lg bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 flex items-center justify-center gap-2 hover:bg-red-100 dark:hover:bg-red-950/50 transition-colors text-sm font-semibold"
-              >
-                <LogOut className="w-4 h-4" />
-                Logout
-              </motion.button>
-            </div>
-          </motion.div>
-        )}
-      </motion.nav>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </nav>
     </>
   );
 }

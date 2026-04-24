@@ -65,18 +65,6 @@ export default function LoginPage() {
             </p>
           </motion.div>
 
-          {/* Demo credentials */}
-          <motion.div
-            variants={itemVariants}
-            className="mb-6 p-4 rounded-xl bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900/30"
-          >
-            <p className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-2">Demo Admin Login</p>
-            <div className="space-y-1 text-sm text-blue-700 dark:text-blue-300">
-              <p>Email: <code className="bg-blue-100 dark:bg-blue-900/30 px-1.5 py-0.5 rounded font-mono text-xs">admin@taskforge.io</code></p>
-              <p>Password: <code className="bg-blue-100 dark:bg-blue-900/30 px-1.5 py-0.5 rounded font-mono text-xs">admin123</code></p>
-            </div>
-          </motion.div>
-
           {/* Form */}
           <motion.form
             variants={itemVariants}

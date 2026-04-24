@@ -21,7 +21,14 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${inter.variable} h-full antialiased`} suppressHydrationWarning>
-      <body className="min-h-full flex flex-col font-sans bg-slate-50 dark:bg-gradient-to-br dark:from-slate-950 dark:via-blue-950/30 dark:to-slate-950 transition-colors duration-300">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('taskforge-theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark')}}catch(e){}})();`,
+          }}
+        />
+      </head>
+      <body className="min-h-full flex flex-col font-sans bg-slate-50 dark:bg-[#0b1120] transition-colors duration-300">
         <ThemeProvider>
           <AuthProvider>
             {children}
