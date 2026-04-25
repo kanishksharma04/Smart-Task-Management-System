@@ -11,6 +11,7 @@ import {
   Bell,
   Mail,
   XCircle,
+  Zap,
 } from 'lucide-react';
 import { useAuth } from '../components/AuthProvider';
 import BackgroundShapes from '../components/BackgroundShapes';
