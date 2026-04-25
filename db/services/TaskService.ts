@@ -28,6 +28,13 @@ export class TaskService extends BaseService implements ITaskService {
         throw new Error(errors.join(', '));
       }
 
+      if (data.projectId) {
+        const existingTask = await this.taskRepository.findByProjectAndTitle(data.projectId, data.title);
+        if (existingTask) {
+          throw new Error('Task title must be unique within the project');
+        }
+      }
+
       return await this.taskRepository.create({
         ...data,
         status: 'pending',

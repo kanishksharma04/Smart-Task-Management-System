@@ -25,3 +25,26 @@ export async function PATCH(
     return NextResponse.json({ error: 'Failed to update user' }, { status: 500 });
   }
 }
+
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const userRepository = UserRepository.getInstance();
+    
+    // First verify if the user exists and is not approved (pending)
+    const user = await userRepository.findById(id);
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    // Delete the user
+    await userRepository.delete(id);
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Delete user error:', error);
+    return NextResponse.json({ error: 'Failed to delete user' }, { status: 500 });
+  }
+}

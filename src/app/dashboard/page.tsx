@@ -237,6 +237,19 @@ export default function DashboardPage() {
     }
   };
 
+  const handleRejectMember = async (id: string) => {
+    try {
+      const res = await fetch(`/api/users/${id}`, {
+        method: 'DELETE',
+      });
+      if (res.ok) {
+        fetchMembers();
+      }
+    } catch (err) {
+      console.error('Failed to reject member', err);
+    }
+  };
+
   const handleCreateProject = async (e: React.FormEvent) => {
     e.preventDefault();
     setProjectError('');
@@ -703,6 +716,7 @@ export default function DashboardPage() {
                         member={member}
                         taskCount={getTaskCountForMember(member._id)}
                         onApprove={handleApproveMember}
+                        onReject={handleRejectMember}
                       />
                     ))}
                   </div>

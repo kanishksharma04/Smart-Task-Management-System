@@ -22,6 +22,12 @@ export class ProjectRepository extends BaseRepository<IProject> {
     return await ProjectModel.find({ ownerId }).sort({ createdAt: -1 }).lean();
   }
 
+  /** Find a project by exact name */
+  public async findByName(name: string): Promise<IProject | null> {
+    await this.connect();
+    return await ProjectModel.findOne({ name }).lean();
+  }
+
   /** Find all projects where a user is a member */
   public async findByMember(userId: string): Promise<IProject[]> {
     await this.connect();

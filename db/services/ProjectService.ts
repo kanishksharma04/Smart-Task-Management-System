@@ -28,6 +28,12 @@ export class ProjectService extends BaseService implements IProjectService {
         throw new Error(errors.join(', '));
       }
 
+      // Enforce unique project name globally
+      const existingProject = await this.projectRepository.findByName(data.name);
+      if (existingProject) {
+        throw new Error('Project name must be unique');
+      }
+
       return await this.projectRepository.create({
         ...data,
         memberIds: [data.ownerId], // Owner is the first member

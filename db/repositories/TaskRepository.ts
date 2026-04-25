@@ -29,6 +29,12 @@ export class TaskRepository extends BaseRepository<ITask> {
     return await TaskModel.find({ projectId }).sort({ createdAt: -1 }).lean();
   }
 
+  /** Find a task by project and title */
+  public async findByProjectAndTitle(projectId: string, title: string): Promise<ITask | null> {
+    await this.connect();
+    return await TaskModel.findOne({ projectId, title }).lean();
+  }
+
   /** Find tasks by status */
   public async findByStatus(status: Status): Promise<ITask[]> {
     await this.connect();

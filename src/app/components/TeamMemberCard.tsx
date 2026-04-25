@@ -15,6 +15,7 @@ interface TeamMemberCardProps {
   isSelected?: boolean;
   onClick?: () => void;
   onApprove?: (id: string) => void;
+  onReject?: (id: string) => void;
 }
 
 const AVATAR_COLORS = [
@@ -28,7 +29,7 @@ const AVATAR_COLORS = [
   'bg-teal-600',
 ];
 
-export default function TeamMemberCard({ member, taskCount = 0, isSelected, onClick, onApprove }: TeamMemberCardProps) {
+export default function TeamMemberCard({ member, taskCount = 0, isSelected, onClick, onApprove, onReject }: TeamMemberCardProps) {
   const initials = member.name
     .split(' ')
     .map((n) => n[0])
@@ -60,15 +61,29 @@ export default function TeamMemberCard({ member, taskCount = 0, isSelected, onCl
         </div>
       </button>
 
-      {member.isApproved === false && onApprove ? (
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => onApprove(member._id)}
-          className="px-3 py-1.5 rounded-lg bg-emerald-100 hover:bg-emerald-200 text-emerald-700 dark:bg-emerald-900/30 dark:hover:bg-emerald-900/50 dark:text-emerald-400 text-xs font-bold uppercase tracking-widest transition-colors shrink-0"
-        >
-          Approve
-        </motion.button>
+      {member.isApproved === false ? (
+        <div className="flex gap-2 shrink-0">
+          {onApprove && (
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => onApprove(member._id)}
+              className="px-3 py-1.5 rounded-lg bg-emerald-100 hover:bg-emerald-200 text-emerald-700 dark:bg-emerald-900/30 dark:hover:bg-emerald-900/50 dark:text-emerald-400 text-xs font-bold uppercase tracking-widest transition-colors"
+            >
+              Approve
+            </motion.button>
+          )}
+          {onReject && (
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => onReject(member._id)}
+              className="px-3 py-1.5 rounded-lg bg-rose-100 hover:bg-rose-200 text-rose-700 dark:bg-rose-900/30 dark:hover:bg-rose-900/50 dark:text-rose-400 text-xs font-bold uppercase tracking-widest transition-colors"
+            >
+              Reject
+            </motion.button>
+          )}
+        </div>
       ) : (
         <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 shrink-0">
           <Hash className="w-3 h-3 text-slate-400" />
